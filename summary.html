@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Order Summary</title>
+  <style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #ffd6e8, #ffe6f2);
+    margin: 0;
+  }
+
+  .container {
+    width: 500px;
+    margin: 60px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  }
+
+  h2 {
+    text-align: center;
+    color: #2e7d32; /* green accent for title */
+    margin-bottom: 20px;
+  }
+
+  label {
+    font-weight: bold;
+    color: #2e7d32;
+  }
+
+  input, select {
+    width: 95%;
+    padding: 10px;
+    margin: 8px 0 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    outline: none;
+    transition: 0.2s;
+  }
+
+  input:focus, select:focus {
+    border-color: #2ecc71;
+    box-shadow: 0 0 5px rgba(46,204,113,0.4);
+  }
+
+  #terms {
+    width: auto;
+    accent-color: #2ecc71;
+  }
+
+  button {
+    padding: 12px;
+    width: 100%;
+    margin-top: 8px;
+    background-color: #2ecc71; /* green buttons */
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+  }
+
+  button:hover {
+    background-color: #27ae60;
+    transform: scale(1.03);
+  }
+
+  .error {
+    color: #e53935;
+    margin-bottom: 10px;
+    min-height: 18px;
+    text-align: center;
+  }
+
+  .item {
+    margin: 10px 0;
+    color: #333;
+  }
+
+  .total {
+    font-weight: bold;
+    margin-top: 15px;
+    font-size: 18px;
+    color: #2e7d32;
+    text-align: center;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>Order Summary</h2>
+
+  <div id="content"></div>
+
+  <button onclick="goBack()">Back to Order</button>
+</div>
+
+<script>
+
+  // Price mapping (same as your dropdown)
+  const prices = {
+    value1: 270,
+    value2: 450,
+    value3: 1000,
+    value4: 380,
+    value5: 500,
+    value6: 1200
+  };
+
+  const labels = {
+    value1: "Pink (Small)",
+    value2: "Pink (Medium)",
+    value3: "Pink (Large)",
+    value4: "Green (Small)",
+    value5: "Green (Medium)",
+    value6: "Green (Large)"
+  };
+
+  function loadSummary() {
+    let content = document.getElementById("content");
+
+    let data = localStorage.getItem("orderData");
+
+    if (!data) {
+      content.innerHTML = "<p class='error'>No order data found.</p>";
+      return;
+    }
+
+    let order = JSON.parse(data);
+
+    let price = prices[order.variant];
+    let total = price * order.quantity;
+
+    content.innerHTML = `
+      <div class="item"><strong>Name:</strong> ${order.name}</div>
+      <div class="item"><strong>Product:</strong> ${labels[order.variant]}</div>
+      <div class="item"><strong>Quantity:</strong> ${order.quantity}</div>
+      <div class="item"><strong>Pickup:</strong> ${order.pickup}</div>
+      <div class="item"><strong>Address:</strong> ${order.pickup === "Delivery" ? order.address : "N/A"}</div>
+      <div class="total">Total: PHP ${total}</div>
+    `;
+  }
+
+  function goBack() {
+    window.location.href = "preorder.html"; // change if your main file name is different
+  }
+
+  loadSummary();
+
+</script>
+
+</body>
+</html>

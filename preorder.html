@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pre-Order Form</title>
+  <style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #ffd6e8, #ffe6f2);
+    margin: 0;
+  }
+
+  .container {
+    width: 500px;
+    margin: 60px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  }
+
+  h2 {
+    text-align: center;
+    color: #2e7d32; /* green accent for title */
+    margin-bottom: 20px;
+  }
+
+  label {
+    font-weight: bold;
+    color: #2e7d32;
+  }
+
+  input, select {
+    width: 95%;
+    padding: 10px;
+    margin: 8px 0 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    outline: none;
+    transition: 0.2s;
+  }
+
+  input:focus, select:focus {
+    border-color: #2ecc71;
+    box-shadow: 0 0 5px rgba(46,204,113,0.4);
+  }
+
+  #terms {
+    width: auto;
+    accent-color: #2ecc71;
+  }
+
+  button {
+    padding: 12px;
+    width: 100%;
+    margin-top: 8px;
+    background-color: #2ecc71; /* green buttons */
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+  }
+
+  button:hover {
+    background-color: #27ae60;
+    transform: scale(1.03);
+  }
+
+  .error {
+    color: #e53935;
+    margin-bottom: 10px;
+    min-height: 18px;
+    text-align: center;
+  }
+
+  .item {
+    margin: 10px 0;
+    color: #333;
+  }
+
+  .total {
+    font-weight: bold;
+    margin-top: 15px;
+    font-size: 18px;
+    color: #2e7d32;
+    text-align: center;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>OINK! Olfactory Inhalation Kit</h2>
+
+  <!-- Error Message Area -->
+  <div id="errorMsg" class="error"></div>
+
+  <form onsubmit="return handleOrder()">
+    
+    <label>Name:</label>
+    <input type="text" id="name">
+
+    <label>Product:</label>
+    <select id="variant">
+      <option value="">Select</option>
+      <option value="value1">Pink (Small) = <strong>PHP 270</strong></option>
+      <option value="value2">Pink (Medium) = <strong>PHP 450</strong></option>
+      <option value="value3">Pink (Large) = <strong>PHP 1000</strong></option>
+      <option value="value4">Green (Small) = <strong>PHP 380</strong></option>
+      <option value="value5">Green (Medium) = <strong>PHP 500</strong></option>
+      <option value="value6">Green (Large) = <strong>PHP 1200</strong></option>
+    </select>
+
+    <label>Quantity:</label>
+    <input type="number" id="quantity">
+
+    <label>Pickup Method:</label>
+    <select id="pickup">
+      <option value="">Select</option>
+      <option value="Delivery">Delivery</option>
+      <option value="Meetup">Meetup</option>
+    </select>
+
+    <label>Address (for delivery only):</label>
+    <input type="text" id="address">
+
+    <label>
+      <input type="checkbox" id="terms"> I accept terms
+    </label>
+    <br><br>
+
+    <button type="button" onclick="loadPreviousOrder()">Load Previous Order</button>
+    <button type="submit">Submit</button>
+
+  </form>
+</div>
+
+<script>
+
+  // COOKIE FUNCTIONS
+  function setCookie(name, value, maxAge) {
+    document.cookie = name + "=" + encodeURIComponent(value) + "; max-age=" + maxAge + "; path=/";
+  }
+
+  function getCookie(name) {
+    let cookies = document.cookie.split("; ");
+    for (let c of cookies) {
+      let [key, val] = c.split("=");
+      if (key === name) return decodeURIComponent(val);
+    }
+    return null;
+  }
+
+  function deleteCookie(name) {
+    document.cookie = name + "=; max-age=0; path=/";
+  }
+
+  // MAIN SUBMIT HANDLER
+  function handleOrder() {
+    document.getElementById("errorMsg").innerHTML = "";
+
+    // TODO: Get values
+    let name = document.getElementById("name").value.trim();
+    let variant = document.getElementById("variant").value;
+    let quantity = document.getElementById("quantity").value;
+    let pickup = document.getElementById("pickup").value;
+    let address = document.getElementById("address").value.trim();
+    let terms = document.getElementById("terms").checked;
+
+    // TODO: Validation
+    // If invalid: Display appropriate error message
+    // return false;
+    if (name === "") {
+      document.getElementById("errorMsg").innerHTML = "Name is required.";
+      return false;
+    }
+
+    if (variant === "") {
+      document.getElementById("errorMsg").innerHTML = "Please select a product.";
+      return false;
+    }
+
+    if (quantity === "" || quantity <= 0) {
+      document.getElementById("errorMsg").innerHTML = "Enter a valid quantity.";
+      return false;
+    }
+
+    if (pickup === "") {
+      document.getElementById("errorMsg").innerHTML = "Select a pickup method.";
+      return false;
+    }
+
+    if (pickup === "Delivery" && address === "") {
+      document.getElementById("errorMsg").innerHTML = "Address is required for delivery, cuz are we gonna find you?";
+      return false;
+    }
+
+    if (!terms) {
+      document.getElementById("errorMsg").innerHTML = "You must accept the terms, you bum.";
+      return false;
+    }
+
+    // Otherwise: Store data (cookies + localStorage)
+    let order = {
+      name,
+      variant,
+      quantity,
+      pickup,
+      address
+    };
+
+    localStorage.setItem("orderData", JSON.stringify(order));
+
+    setCookie("name", name, 86400);
+    setCookie("variant", variant, 86400);
+    setCookie("quantity", quantity, 86400);
+    setCookie("pickup", pickup, 86400);
+    setCookie("address", address, 86400);
+
+    // Redirect to summary.html
+    window.location.href = "summary.html";
+
+    return false;
+  }
+
+  // LOAD PREVIOUS ORDER
+  function loadPreviousOrder() {
+
+    // TODO: Retrieve stored data
+    let data = localStorage.getItem("orderData");
+
+    // TODO: If no data: Display error message "No previous order data"
+    if (!data) {
+      document.getElementById("errorMsg").innerHTML = "No previous order data";
+      return;
+    }
+
+    // TODO: Otherwise: Populate fields
+    let order = JSON.parse(data);
+
+    document.getElementById("name").value = order.name;
+    document.getElementById("variant").value = order.variant;
+    document.getElementById("quantity").value = order.quantity;
+    document.getElementById("pickup").value = order.pickup;
+    document.getElementById("address").value = order.address;
+
+    document.getElementById("errorMsg").innerHTML = "Previous order loaded!";
+  }
+
+</script>
+</body>
+</html>
